@@ -152,9 +152,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .title-wrap {
   position: absolute;
-  top: 22px;
+  top: 30px;
   left: 50%;
-  width: 920px;
+  width: 460px;
   transform: translateX(-50%);
   display: grid;
   place-items: center;
