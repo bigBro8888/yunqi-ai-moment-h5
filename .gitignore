@@ -1,0 +1,7 @@
+.codex/
+.superpowers/
+source-images/
+upload/
+node_modules/
+dist/
+

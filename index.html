@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#eaf8ff">
+  <meta name="description" content="云栖大会 AI 互动纪念页，支持后端传入人物照片并分享。">
+  <title>我的 AI 云栖时刻｜云栖大会 AI 互动体验</title>
+  <link rel="stylesheet" href="./styles.css?v=10">
+</head>
+<body>
+  <main class="viewport" aria-label="我的 AI 云栖时刻互动页面">
+    <div class="stage-shell" id="stage-shell">
+      <article class="stage" id="stage" aria-label="云栖大会互动海报">
+        <div class="venue-layer" aria-hidden="true">
+          <img id="venue-person" class="venue-image is-active" src="./assets/yunqi-person.png" alt="">
+          <img id="venue-empty" class="venue-image" src="./assets/yunqi-empty.png" alt="">
+          <div class="venue-breathe"></div>
+        </div>
+
+        <div class="top-rebuild" aria-hidden="true"></div>
+        <div class="bottom-rebuild" aria-hidden="true"></div>
+        <div class="particle-field" id="particles" aria-hidden="true"></div>
+
+        <header class="hero-copy">
+          <p class="eyebrow" data-component-id="eyebrow">云栖大会 AI 互动体验</p>
+
+          <div class="title-wrap">
+            <svg class="title-orbit" viewBox="0 0 830 205" aria-hidden="true">
+              <defs>
+                <linearGradient id="orbit-gradient" x1="0" x2="1">
+                  <stop offset="0" stop-color="#2d78ff" stop-opacity="0"/>
+                  <stop offset=".42" stop-color="#5ab5ff"/>
+                  <stop offset=".72" stop-color="#4ce5da"/>
+                  <stop offset="1" stop-color="#2d78ff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <ellipse class="orbit-track" cx="415" cy="102" rx="392" ry="76" pathLength="100"/>
+              <ellipse class="orbit-flow" cx="415" cy="102" rx="392" ry="76" pathLength="100"/>
+            </svg>
+            <h1 class="main-title" data-component-id="title">我的 AI 云栖时刻</h1>
+            <span class="sparkle" aria-hidden="true"></span>
+          </div>
+
+          <h2 class="subtitle" data-component-id="subtitle">让这一刻，被 AI 记录</h2>
+        </header>
+
+        <section class="portal" aria-label="AI 云栖时刻影像区域">
+          <div class="custom-photo-wrap" id="custom-photo-wrap" aria-hidden="true">
+            <img id="custom-photo" class="custom-photo" alt="自定义云栖时刻照片">
+          </div>
+          <div class="holo-core" aria-hidden="true"></div>
+          <svg class="holo-ring ring-one" viewBox="0 0 720 150" aria-hidden="true">
+            <defs>
+              <linearGradient id="ring-gradient" x1="0" x2="1">
+                <stop offset="0" stop-color="#57b8ff" stop-opacity="0"/>
+                <stop offset=".48" stop-color="#8eeaff"/>
+                <stop offset=".72" stop-color="#56e6d1"/>
+                <stop offset="1" stop-color="#57b8ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <ellipse class="ring-track" cx="360" cy="75" rx="350" ry="61" pathLength="100"/>
+            <ellipse class="ring-flow" cx="360" cy="75" rx="350" ry="61" pathLength="100"/>
+          </svg>
+        </section>
+
+        <section class="actions" aria-label="页面操作">
+          <button class="primary-action" id="share-button" type="button" data-component-id="share">
+            <span>分享我的云栖时刻</span>
+            <span class="arrow-disc" aria-hidden="true">→</span>
+          </button>
+        </section>
+
+        <footer class="info-zone">
+          <div class="event-lines">
+            <p data-component-id="support">安墨客提供 AI 技术支持</p>
+            <p class="slogan" data-component-id="slogan">AI 让空间更智能，让运营更简单</p>
+          </div>
+
+          <div class="capability-ticker" aria-label="安墨客空间智能能力">
+            <div class="ticker-row">
+              <div class="ticker-track">
+                <ul class="ticker-group">
+                  <li class="capability-chip" data-component-id="capability1"><span>RFID精准感知</span></li>
+                  <li class="capability-chip" data-component-id="capability2"><span>智慧展厅</span></li>
+                  <li class="capability-chip" data-component-id="capability3"><span>空间智能运营</span></li>
+                  <li class="capability-chip" data-component-id="capability4"><span>IoT智能硬件</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="ticker-row ticker-row-reverse">
+              <div class="ticker-track">
+                <ul class="ticker-group">
+                  <li class="capability-chip" data-component-id="capability5"><span>现场签到识别</span></li>
+                  <li class="capability-chip" data-component-id="capability6"><span>访客轨迹洞察</span></li>
+                  <li class="capability-chip" data-component-id="capability7"><span>展项智能联动</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </article>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div id="share-sheet" class="share-sheet" hidden>
+      <button id="share-mask" class="share-sheet-mask" type="button" aria-label="关闭分享"></button>
+      <div class="share-sheet-body">
+        <div class="share-poster-preview">
+          <img id="share-poster-img" alt="我的 AI 云栖时刻海报">
+          <p>长按海报可保存图片</p>
+        </div>
+        <div class="share-sheet-panel">
+          <p class="share-sheet-title">分享到</p>
+          <div class="share-poster-actions">
+            <button class="share-poster-btn wechat" type="button" data-share="wechat">微信好友</button>
+            <button class="share-poster-btn moments" type="button" data-share="moments">分享到朋友圈</button>
+          </div>
+          <button id="share-cancel" class="share-cancel" type="button">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="poster-preview" class="poster-preview" hidden>
+      <button id="poster-preview-mask" class="poster-preview-mask" type="button" aria-label="关闭海报预览"></button>
+      <div class="poster-preview-panel">
+        <p id="poster-preview-tip">长按图片保存到相册</p>
+        <img id="poster-preview-img" alt="我的 AI 云栖时刻海报">
+        <button id="poster-preview-close" type="button">关闭</button>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="./src/main.js?v=15"></script>
+</body>
+</html>
