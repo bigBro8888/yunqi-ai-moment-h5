@@ -36,34 +36,7 @@ function textTarget(element) {
   return element;
 }
 
-function bits(className, digits) {
-  const element = document.createElement('i');
-  element.className = `title-bits ${className}`;
-  element.setAttribute('aria-hidden', 'true');
-  element.textContent = digits;
-  return element;
-}
-
-function setTitleText(element, value) {
-  element.textContent = '';
-  for (const part of String(value).split(/(AI)/)) {
-    if (!part) continue;
-    if (part !== 'AI') {
-      element.append(document.createTextNode(part));
-      continue;
-    }
-    const accent = document.createElement('span');
-    accent.className = 'title-ai';
-    accent.append(bits('title-bits--top', '0101\n0010'), part, bits('title-bits--bottom', '0010\n1101'));
-    element.append(accent);
-  }
-}
-
 function setElementText(element, value) {
-  if (element.matches('.main-title')) {
-    setTitleText(element, value);
-    return;
-  }
   textTarget(element).textContent = value;
 }
 
