@@ -44,10 +44,12 @@ test('orbital accents keep their geometry fixed and animate only short light seg
 
 test('local image assets exist and markup has no external runtime assets', async () => {
   const html = await read('index.html');
-  const person = await stat(new URL('../assets/yunqi-person.png', import.meta.url));
-  const empty = await stat(new URL('../assets/yunqi-empty.png', import.meta.url));
-  assert.ok(person.size > 100_000);
-  assert.ok(empty.size > 100_000);
+  const css = await read('styles.css');
+  const background = await stat(new URL('../assets/back1.png', import.meta.url));
+  assert.ok(background.size > 100_000);
+  assert.match(html, /src="\.\/assets\/back1\.png(?:\?[^"]*)?"/);
+  assert.doesNotMatch(html, /yunqi-person\.png|yunqi-empty\.png|top-rebuild|bottom-rebuild/);
+  assert.doesNotMatch(css, /\.top-rebuild|\.bottom-rebuild/);
   assert.doesNotMatch(html, /<(?:script|link|img)[^>]+(?:src|href)="https?:\/\//i);
 });
 

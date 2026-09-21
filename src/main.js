@@ -1,13 +1,14 @@
-import { DEFAULT_STATE, normalizeState } from './state.js?v=15';
-import { fitStage } from './geometry.js?v=15';
-import { serializeExportName } from './actions.js?v=15';
-import { componentInlineStyle, buildStageSvg } from './view-model.js?v=15';
+import { DEFAULT_STATE, normalizeState } from './state.js?v=17';
+import { fitStage } from './geometry.js?v=17';
+import { serializeExportName } from './actions.js?v=17';
+import { componentInlineStyle, buildStageSvg } from './view-model.js?v=17';
 
 const DESIGN = { width: 941, height: 1672 };
 const stage = document.querySelector('#stage');
 const shell = document.querySelector('#stage-shell');
 const customPhoto = document.querySelector('#custom-photo');
 const customPhotoWrap = document.querySelector('#custom-photo-wrap');
+const defaultCharacter = document.querySelector('#default-character');
 const toast = document.querySelector('#toast');
 
 const state = normalizeState(DEFAULT_STATE);
@@ -35,7 +36,34 @@ function textTarget(element) {
   return element;
 }
 
+function bits(className, digits) {
+  const element = document.createElement('i');
+  element.className = `title-bits ${className}`;
+  element.setAttribute('aria-hidden', 'true');
+  element.textContent = digits;
+  return element;
+}
+
+function setTitleText(element, value) {
+  element.textContent = '';
+  for (const part of String(value).split(/(AI)/)) {
+    if (!part) continue;
+    if (part !== 'AI') {
+      element.append(document.createTextNode(part));
+      continue;
+    }
+    const accent = document.createElement('span');
+    accent.className = 'title-ai';
+    accent.append(bits('title-bits--top', '0101\n0010'), part, bits('title-bits--bottom', '0010\n1101'));
+    element.append(accent);
+  }
+}
+
 function setElementText(element, value) {
+  if (element.matches('.main-title')) {
+    setTitleText(element, value);
+    return;
+  }
   textTarget(element).textContent = value;
 }
 
@@ -49,8 +77,6 @@ function renderComponent(id, componentState) {
 }
 
 function renderPhoto() {
-  const person = document.querySelector('#venue-person');
-  const empty = document.querySelector('#venue-empty');
   const guestUrl = guestPhotoFailed ? '' : getGuestPhotoUrl();
   const showGuest = Boolean(guestUrl);
   if (showGuest && customPhoto.dataset.guestSrc !== guestUrl) {
@@ -58,8 +84,7 @@ function renderPhoto() {
     customPhoto.src = guestUrl;
   }
   const guestReady = showGuest && customPhoto.complete && customPhoto.naturalWidth > 0;
-  person.classList.toggle('is-active', !guestReady);
-  empty.classList.toggle('is-active', guestReady);
+  defaultCharacter.classList.toggle('is-hidden', guestReady);
   customPhotoWrap.classList.toggle('is-active', guestReady);
   customPhotoWrap.classList.toggle('is-guest', guestReady);
   customPhotoWrap.setAttribute('aria-hidden', guestReady ? 'false' : 'true');
@@ -231,7 +256,7 @@ function upsertMeta(attrName, attrValue, content) {
 
 function updateShareMeta() {
   const pageUrl = location.href.split('#')[0];
-  const imageUrl = getGuestPhotoUrl() || new URL('./assets/yunqi-person.png', location.href).href;
+  const imageUrl = getGuestPhotoUrl() || new URL('./assets/back1.png', location.href).href;
   document.title = SHARE_TITLE;
   upsertMeta('name', 'description', SHARE_TEXT);
   upsertMeta('property', 'og:title', SHARE_TITLE);
