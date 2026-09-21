@@ -116,13 +116,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .subtitle,
 .default-character,
 .custom-photo-wrap,
-.info-zone,
+.event-lines .slogan,
+.capability-ticker,
 .particle-field,
 .title-orbit,
 .sparkle,
 .holo-core,
-.holo-ring,
-.primary-action::before {
+.holo-ring {
   display: none !important;
 }
 .eyebrow {
@@ -152,9 +152,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .title-wrap {
   position: absolute;
-  top: 30px;
+  top: 26px;
   left: 50%;
-  width: 460px;
+  width: 600px;
   transform: translateX(-50%);
   display: grid;
   place-items: center;
@@ -352,13 +352,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
   z-index: 5;
   left: 0;
   right: 0;
-  top: 1340px;
-  height: 320px;
+  bottom: 58px;
   text-align: center;
 }
-.event-lines { color: #6689b4; }
+.event-lines { color: #0c3f7e; }
 .event-lines p { margin: 0; }
-.event-lines > p:not(.slogan) { font-size: 21px; line-height: 1.9; font-weight: 700; letter-spacing: .12em; }
+.event-lines > p:not(.slogan) { font-size: 24px; line-height: 1.6; font-weight: 700; letter-spacing: .12em; text-shadow: 0 1px 3px rgba(255, 255, 255, .8); }
 .event-lines > p:not(.slogan)::before, .event-lines > p:not(.slogan)::after { content: ""; display: inline-block; width: 54px; height: 1px; margin: 0 20px 6px; background: currentColor; opacity: .48; }
 .event-lines .slogan { margin-top: 7px; color: #86a1bf; font-size: 16px; font-weight: 600; letter-spacing: .08em; }
 
