@@ -138,27 +138,75 @@ async function preloadGuestPhoto() {
   }
 }
 
-async function inlineCloneImages(clone) {
+function loadImageElement(source) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image), { once: true });
+    image.addEventListener('error', () => reject(new Error('图片加载失败')), { once: true });
+    image.src = source;
+  });
+}
+
+async function imageDataUrl(image) {
+  const source = image.currentSrc || image.src;
+  if (!source) throw new Error('图片加载失败');
+  if (source.startsWith('data:')) return source;
+  const guestUrl = getGuestPhotoUrl();
+  if (guestPhotoDataUrl && guestUrl && (source === guestUrl || image.id === 'custom-photo')) return guestPhotoDataUrl;
+  const blob = isCrossOriginUrl(source) ? await fetchImageBlob(source) : await (await fetch(source)).blob();
+  return blobToDataUrl(blob);
+}
+
+function isVisible(element) {
+  return element.offsetWidth > 0 && element.offsetHeight > 0
+    && window.getComputedStyle(element).visibility !== 'hidden';
+}
+
+function objectPositionRatios(element) {
+  const ratios = window.getComputedStyle(element).objectPosition.split(/\s+/).map((part) => {
+    const percent = /^(-?[\d.]+)%$/.exec(part);
+    return percent ? Number(percent[1]) / 100 : 0.5;
+  });
+  return { x: ratios[0] ?? 0.5, y: ratios[1] ?? 0.5 };
+}
+
+// WebKit drops images nested in an SVG foreignObject, so every <img> is measured
+// here and painted straight onto the poster canvas instead.
+async function extractPosterLayers(clone) {
   const originals = [...stage.querySelectorAll('img')];
   const copies = [...clone.querySelectorAll('img')];
-  const guestUrl = getGuestPhotoUrl();
-  await Promise.all(originals.map(async (image, index) => {
-    const source = image.currentSrc || image.src;
-    if (!source || source.startsWith('data:')) {
-      if (source) copies[index].src = source;
-      return;
-    }
-    if (guestPhotoDataUrl && guestUrl && (source === guestUrl || image.id === 'custom-photo')) {
-      copies[index].src = guestPhotoDataUrl;
-      return;
-    }
+  const stageRect = stage.getBoundingClientRect();
+  const scale = stageRect.width / DESIGN.width || 1;
+  const layers = await Promise.all(originals.map(async (original, index) => {
+    copies[index].remove();
+    if (!isVisible(original)) return null;
+    const rect = original.getBoundingClientRect();
+    const box = {
+      x: (rect.left - stageRect.left) / scale,
+      y: (rect.top - stageRect.top) / scale,
+      width: rect.width / scale,
+      height: rect.height / scale,
+    };
     try {
-      const blob = isCrossOriginUrl(source) ? await fetchImageBlob(source) : await (await fetch(source)).blob();
-      copies[index].src = await blobToDataUrl(blob);
+      return { image: await loadImageElement(await imageDataUrl(original)), box, position: objectPositionRatios(original) };
     } catch (error) {
-      if (image.id !== 'custom-photo') throw error;
+      if (original.id !== 'custom-photo') throw error;
+      return null;
     }
   }));
+  return layers.filter(Boolean);
+}
+
+function drawPosterLayer(context, { image, box, position }) {
+  const scale = Math.max(box.width / image.naturalWidth, box.height / image.naturalHeight);
+  const width = image.naturalWidth * scale;
+  const height = image.naturalHeight * scale;
+  context.save();
+  context.beginPath();
+  context.rect(box.x, box.y, box.width, box.height);
+  context.clip();
+  context.drawImage(image, box.x + (box.width - width) * position.x, box.y + (box.height - height) * position.y, width, height);
+  context.restore();
 }
 
 function pageCssText() {
@@ -169,23 +217,27 @@ function pageCssText() {
 }
 
 async function renderPosterCanvas() {
+  const backdrop = window.getComputedStyle(stage).backgroundColor;
   const clone = stage.cloneNode(true);
   clone.style.transform = 'none';
   clone.style.setProperty('--stage-scale', '1');
-  await inlineCloneImages(clone);
+  const layers = await extractPosterLayers(clone);
+  clone.style.background = 'transparent';
   const markup = new XMLSerializer().serializeToString(clone);
 
   const svg = buildStageSvg(markup, pageCssText(), DESIGN.width, DESIGN.height);
-  const image = new Image();
-  await new Promise((resolve, reject) => {
-    image.addEventListener('load', resolve, { once: true });
-    image.addEventListener('error', () => reject(new Error('页面合成失败')), { once: true });
-    image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-  });
+  const overlay = await loadImageElement(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`)
+    .catch(() => { throw new Error('页面合成失败'); });
+  if (overlay.decode) await overlay.decode().catch(() => {});
+
   const canvas = document.createElement('canvas');
   canvas.width = DESIGN.width;
   canvas.height = DESIGN.height;
-  canvas.getContext('2d').drawImage(image, 0, 0, DESIGN.width, DESIGN.height);
+  const context = canvas.getContext('2d');
+  context.fillStyle = backdrop;
+  context.fillRect(0, 0, DESIGN.width, DESIGN.height);
+  layers.forEach((layer) => drawPosterLayer(context, layer));
+  context.drawImage(overlay, 0, 0, DESIGN.width, DESIGN.height);
   return canvas;
 }
 

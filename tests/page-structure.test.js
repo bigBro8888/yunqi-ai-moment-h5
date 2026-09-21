@@ -75,3 +75,11 @@ test('main module consumes state, geometry, and actions and wires share export',
   assert.doesNotMatch(source, /editor-toggle/);
   assert.doesNotMatch(source, /function drawText/);
 });
+
+test('poster export paints images on the canvas instead of nesting them in the svg overlay', async () => {
+  const source = await read('src/main.js');
+  assert.match(source, /extractPosterLayers/);
+  assert.match(source, /copies\[index\]\.remove\(\)/);
+  assert.match(source, /drawPosterLayer/);
+  assert.doesNotMatch(source, /copies\[index\]\.src/);
+});
